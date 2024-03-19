@@ -31,44 +31,39 @@ function displaySubmissions(submissions, containerId) {
     }
 }
 
-// Function to fetch LeetCode data
-function fetchLeetCodeData(username) {
-    // LeetCode Stats API endpoint
-    const leetCodeStatsEndpoint = `https://alfa-leetcode-api.onrender.com/${username}/acSubmission`;
+// LeetCode Stats API endpoint
+const leetCodeStatsEndpoint = `https://leetcode-stats-api.herokuapp.com/abibyte`;
 
-    // Fetch LeetCode submissions
-    fetch(leetCodeStatsEndpoint)
-        .then(response => response.json())
-        .then(data => {
-            if (data.count > 0) {
-                displayLeetCodeSubmissions(data.submission, 'leetcode-submissions-container');
-            } else {
-                console.error('No LeetCode submissions found for the user:', username);
-            }
-        })
-        .catch(error => console.error('Error fetching LeetCode submissions:', error));
-}
+// Fetch LeetCode stats
+fetch(leetCodeStatsEndpoint)
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            displayLeetCodeStats(data);
+        } else {
+            console.error('Failed to fetch LeetCode stats:', data.message);
+        }
+    })
+    .catch(error => console.error('Error fetching LeetCode stats:', error));
 
-// Function to display LeetCode submissions
-function displayLeetCodeSubmissions(submissions, containerId) {
-    const submissionsContainer = document.getElementById(containerId);
-    for (let i = 0; i < Math.min(submissions.length, 10); i++) {
-        // Convert Unix timestamp to human-readable date
-        const submissionDate = new Date(parseInt(submissions[i].timestamp) * 1000).toLocaleString();
-
-        const submissionElement = document.createElement('div');
-        submissionElement.classList.add('submission');
-        submissionElement.innerHTML = `
-            <span class="submission-title">${submissions[i].title}</span>
-            <span class="submission-status">${submissions[i].statusDisplay}</span>
-            <span class="submission-date">${submissionDate}</span> 
-        `;
-        submissionsContainer.appendChild(submissionElement);
-    }
+// Function to display LeetCode stats
+function displayLeetCodeStats(stats) {
+    const leetCodeStatsContainer = document.getElementById('leetcode-submissions-container');
+    leetCodeStatsContainer.innerHTML = `
+        <p>Total Solved: ${stats.totalSolved}</p>
+        <p>Total Questions: ${stats.totalQuestions}</p>
+        <p>Easy Solved: ${stats.easySolved} / Total Easy: ${stats.totalEasy}</p>
+        <p>Medium Solved: ${stats.mediumSolved} / Total Medium: ${stats.totalMedium}</p>
+        <p>Hard Solved: ${stats.hardSolved} / Total Hard: ${stats.totalHard}</p>
+        <p>Acceptance Rate: ${stats.acceptanceRate}%</p>
+        <p>Ranking: ${stats.ranking}</p>
+        <p>Contribution Points: ${stats.contributionPoints}</p>
+        <p>Reputation: ${stats.reputation}</p>
+    `;
 }
 
 // Fetch Codeforces submissions
 fetchCodeforcesSubmissions('abinashlingank');
 
-// Fetch LeetCode data
-fetchLeetCodeData('abinashlingank');
+// // Fetch LeetCode data
+// fetchLeetCodeData('abinashlingank');
