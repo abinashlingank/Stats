@@ -1,0 +1,28 @@
+/* Add your styles here */
+
+/* Submission styles */
+
+/* *{
+    margin: 0;
+} */
+.submission {
+    margin-bottom: 10px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.submission-id {
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+.submission-problem {
+    margin-right: 10px;
+}
+
+.submission-verdict {
+    font-style: italic;
+    color: green;
+    /* You can adjust the color based on verdict */
+}
