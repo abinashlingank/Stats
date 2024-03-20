@@ -125,6 +125,119 @@ function displayRecentSubmissions(submissions, containerId) {
     }
 }
 
+
+// Function to fetch CodeChef submissions
+function fetchCodeChefSubmissions(userHandle) {
+    fetch(`https://stats-server-one.vercel.app/codechef-submissions/${userHandle}`)
+        .then(response => response.text()) // Get the response as text
+        .then(data => {
+            const submissions = parseCodeChefSubmissions(data);
+            displayCodeChefSubmissions(submissions, 'codechef-submissions-container');
+        })
+        .catch(error => console.error('Error fetching CodeChef submissions:', error));
+}
+
+// function parseCodeChefSubmissions(data) {
+//     const parser = new DOMParser();
+//     // const doc = parser.parseFromString(data, 'text/html'); // Parse the HTML content
+//     const htmlContent = JSON.parse(data).content;
+//     const doc = parser.parseFromString(htmlContent, 'text/html');
+//     console.log("DOC:",doc);
+//     const rows = doc.querySelectorAll('.dataTable tbody tr');
+//     const submissions = [];
+//     rows.forEach(row => {
+//         const cols = row.querySelectorAll('td');
+//         if (cols.length === 5) {
+//             const time = cols[0].textContent.trim();
+//             const problem = cols[1].querySelector('a').textContent.trim();
+//             const result = cols[2].querySelector('span').title.trim(); // Extracting the title attribute
+//             const language = cols[3].textContent.trim();
+//             const solutionLink = cols[4].querySelector('a').href.trim();
+//             submissions.push({ time, problem, result, language, solutionLink });
+//         }
+//     });
+//     console.log(submissions);
+//     return submissions;
+// }
+
+// function parseCodeChefSubmissions(data) {
+//     const parser = new DOMParser();
+//     const htmlContent = JSON.parse(data).content;
+//     const doc = parser.parseFromString(htmlContent, 'text/html');
+//     const today = new Date();
+//     today.setHours(0, 0, 0, 0); // Set to start of today
+
+//     const rows = doc.querySelectorAll('.dataTable tbody tr');
+//     const submissions = [];
+
+//     rows.forEach(row => {
+//         const cols = row.querySelectorAll('td');
+//         if (cols.length === 5) {
+//             const submissionDate = new Date(cols[0].textContent.trim());
+//             console.log(cols[0].textContent.trim());
+//             // Check if the submission date is today
+//             if (submissionDate >= today) {
+//                 const time = cols[0].textContent.trim();
+//                 const problem = cols[1].querySelector('a').textContent.trim();
+//                 const result = cols[2].querySelector('span').title.trim();
+//                 const language = cols[3].textContent.trim();
+//                 const solutionLink = cols[4].querySelector('a').href.trim();
+//                 submissions.push({ time, problem, result, language, solutionLink });
+//             }
+//         }
+//     });
+
+//     return submissions;
+// }
+
+function parseCodeChefSubmissions(data) {
+    const parser = new DOMParser();
+    const htmlContent = JSON.parse(data).content;
+    const doc = parser.parseFromString(htmlContent, 'text/html');
+    const submissions = [];
+
+    const rows = doc.querySelectorAll('.dataTable tbody tr');
+
+    rows.forEach(row => {
+        const cols = row.querySelectorAll('td');
+        if (cols.length === 5) {
+            const timestamp = cols[0].textContent.trim();
+            // Check if the timestamp includes "ago" for recent submissions
+            if (timestamp.includes('ago')) {
+                const problem = cols[1].querySelector('a').textContent.trim();
+                const result = cols[2].querySelector('span').title.trim();
+                const language = cols[3].textContent.trim();
+                const solutionLink = cols[4].querySelector('a').href.trim();
+                submissions.push({ time: timestamp, problem, result, language, solutionLink });
+            }
+        }
+    });
+
+    return submissions;
+}
+
+// Function to display CodeChef submissions
+function displayCodeChefSubmissions(submissions, containerId) {
+    const submissionsContainer = document.getElementById(containerId);
+    // submissionsContainer.innerHTML = '<h2>CodeChef Submissions</h2>';
+    submissions.forEach(submission => {
+        const submissionElement = document.createElement('div');
+        submissionElement.classList.add('submission');
+        submissionElement.innerHTML = `
+            <span class="submission-id">${submission.time}</span>
+            <span class="submission-verdict">${submission.result}</span><br>
+            <span class="submission-problem">${submission.problem}</span>
+        `;
+        submissionsContainer.appendChild(submissionElement);
+    });
+}
+
+// Fetch CodeChef submissions
+fetchCodeChefSubmissions('abinashlingank');
+
+// Fetch CodeChef submissions
+// fetchCodeChefSubmissions('abinashlingank');
+
 // Fetch LeetCode data on page load
 fetchLeetCodeData('abibyte');
 
