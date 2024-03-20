@@ -126,7 +126,7 @@ function displayRecentSubmissions(submissions, containerId) {
 }
 
 // Fetch LeetCode data on page load
-fetchLeetCodeData('abinashlingank');
+fetchLeetCodeData('abibyte');
 
 fetchLeetCodeStats('abibyte');
 
