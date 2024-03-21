@@ -225,9 +225,9 @@ function displayCodeChefSubmissions(submissions, containerId) {
         const start = new Date();
         start.setHours(0, 0, 0, 0);
         const diff = (currtime.getTime() - start.getTime())/(1000 * 60 * 60);
-        console.log(diff);
+        // console.log(diff);
         // console.log(parseInt(submission.time.split("")[0]));
-        console.log(submission.time.split(" "));
+        // console.log(submission.time.split(" "));
         if (submission.time.includes("hour")) {
             // Check if the submission was within the last 'diff' hours
             const hoursAgo = parseInt(submission.time.split(" ")[0]);
