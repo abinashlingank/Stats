@@ -25,6 +25,9 @@ function displaySubmissions(submissions, containerId) {
 
     for (let i = 0; i < submissions.length; i++) {
         // Convert Unix timestamp to human-readable date
+        if(submissions[i].verdict !== "OK"){
+            continue;
+        }
         const submissionDate = new Date(submissions[i].creationTimeSeconds * 1000).toLocaleString();
 
         const submissionElement = document.createElement('div');
@@ -114,6 +117,9 @@ function displayRecentSubmissions(submissions, containerId) {
 
     for (let i = 0; i < submissions.length; i++) {
         const submission = submissions[i];
+        if(submission.statusDisplay !== "Accepted"){
+            continue;
+        }
         const submissionElement = document.createElement('div');
         submissionElement.classList.add('submission');
         submissionElement.innerHTML = `
@@ -221,35 +227,38 @@ function displayCodeChefSubmissions(submissions, containerId) {
     const submissionsContainer = document.getElementById(containerId);
     // submissionsContainer.innerHTML = '<h2>CodeChef Submissions</h2>';
     submissions.forEach(submission => {
-        const currtime = new Date();
-        const start = new Date();
-        start.setHours(0, 0, 0, 0);
-        const diff = (currtime.getTime() - start.getTime())/(1000 * 60 * 60);
-        // console.log(diff);
-        // console.log(parseInt(submission.time.split("")[0]));
-        // console.log(submission.time.split(" "));
-        if (submission.time.includes("hour")) {
-            // Check if the submission was within the last 'diff' hours
-            const hoursAgo = parseInt(submission.time.split(" ")[0]);
-            if (hoursAgo <= diff) {
+        if(submission.result === "accepted"){
+            
+            const currtime = new Date();
+            const start = new Date();
+            start.setHours(0, 0, 0, 0);
+            const diff = (currtime.getTime() - start.getTime())/(1000 * 60 * 60);
+            // console.log(diff);
+            // console.log(parseInt(submission.time.split("")[0]));
+            // console.log(submission.time.split(" "));
+            if (submission.time.includes("hour")) {
+                // Check if the submission was within the last 'diff' hours
+                const hoursAgo = parseInt(submission.time.split(" ")[0]);
+                if (hoursAgo <= diff) {
+                    const submissionElement = document.createElement('div');
+                    submissionElement.classList.add('submission');
+                    submissionElement.innerHTML = `
+                        <span class="submission-id">${submission.time}</span>
+                        <span class="submission-verdict">${submission.result}</span><br>
+                        <span class="submission-problem">${submission.problem}</span>
+                    `;
+                    submissionsContainer.appendChild(submissionElement);
+                }
+            } else{
                 const submissionElement = document.createElement('div');
                 submissionElement.classList.add('submission');
                 submissionElement.innerHTML = `
-                    <span class="submission-id">${submission.time}</span>
-                    <span class="submission-verdict">${submission.result}</span><br>
-                    <span class="submission-problem">${submission.problem}</span>
+                <span class="submission-id">${submission.time}</span>
+                <span class="submission-verdict">${submission.result}</span><br>
+                <span class="submission-problem">${submission.problem}</span>
                 `;
                 submissionsContainer.appendChild(submissionElement);
             }
-        } else{
-            const submissionElement = document.createElement('div');
-            submissionElement.classList.add('submission');
-            submissionElement.innerHTML = `
-            <span class="submission-id">${submission.time}</span>
-            <span class="submission-verdict">${submission.result}</span><br>
-            <span class="submission-problem">${submission.problem}</span>
-            `;
-            submissionsContainer.appendChild(submissionElement);
         }
     });
 }
