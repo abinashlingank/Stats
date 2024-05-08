@@ -56,6 +56,48 @@ function fetchLeetCodeData(username) {
         .catch(error => console.error('Error fetching LeetCode data:', error));
 }
 
+// // Function to fetch LeetCode stats and submissions
+// function fetchLeetCodeData(username) {
+//     fetch(`https://stats-server-one.vercel.app/user-profile/${username}`)
+//         .then(response => response.json())
+//         .then(data => {
+//             if (data && data.recentSubmissionList) {
+//                 // Fetch question IDs for each submission
+//                 const submissionPromises = data.recentSubmissionList.map(submission => {
+//                     return fetch(`https://stats-server-one.vercel.app/question/${submission.titleSlug}`)
+//                         .then(response => response.json())
+//                         .then(questionData => {
+//                             // If question data is available and contains question ID
+//                             if (questionData && questionData.questionId) {
+//                                 submission.questionId = questionData.questionId;
+//                             } else {
+//                                 submission.questionId = null;
+//                             }
+//                             return submission;
+//                         })
+//                         .catch(error => {
+//                             console.error('Error fetching question ID:', error);
+//                             return null;
+//                         });
+//                 });
+
+//                 // Resolve all submission promises
+//                 Promise.all(submissionPromises)
+//                     .then(submissions => {
+//                         // Filter out null values (failed fetches)
+//                         const validSubmissions = submissions.filter(submission => submission !== null);
+//                         // Display recent submissions with question IDs
+//                         displayRecentSubmissions(validSubmissions, 'leetcode-submissions-container');
+//                     })
+//                     .catch(error => console.error('Error fetching LeetCode submissions:', error));
+//             } else {
+//                 console.error('Failed to fetch LeetCode data:', data);
+//             }
+//         })
+//         .catch(error => console.error('Error fetching LeetCode data:', error));
+// }
+
+
 // Function to display LeetCode stats
 function displayLeetCodeStats(data) {
     const leetCodeStatsContainer = document.getElementById('leetcode-stats-container');
@@ -104,6 +146,34 @@ function displayLeetCodeStats(stats, containerId) {
     `;
 }
 
+// // Function to display recent submissions
+// function displayRecentSubmissions(submissions, containerId) {
+//     const submissionsContainer = document.getElementById(containerId);
+//     const today = new Date();
+//     today.setHours(0, 0, 0, 0); // set to start of today
+
+//     submissions = submissions.filter(submission => {
+//         const submissionDate = new Date(parseInt(submission.timestamp) * 1000);
+//         return submissionDate >= today;
+//     });
+
+//     for (let i = 0; i < submissions.length; i++) {
+//         const submission = submissions[i];
+//         if(submission.statusDisplay !== "Accepted"){
+//             continue;
+//         }
+//         const submissionElement = document.createElement('div');
+//         submissionElement.classList.add('submission');
+//         submissionElement.innerHTML = `
+//             <span class="submission-id">${new Date(parseInt(submission.timestamp) * 1000).toLocaleString()}</span>
+//             <span class="submission-verdict">${submission.statusDisplay}</span><br>
+//             <span class="submission-problem">${submission.title}<b>(${submission.questionId})</b></span>
+//             `;
+//             submissionsContainer.appendChild(submissionElement);
+//         }
+//     }
+    // <span class="submission-problem">${submission.title}</span>
+
 // Function to display recent submissions
 function displayRecentSubmissions(submissions, containerId) {
     const submissionsContainer = document.getElementById(containerId);
@@ -112,23 +182,46 @@ function displayRecentSubmissions(submissions, containerId) {
 
     submissions = submissions.filter(submission => {
         const submissionDate = new Date(parseInt(submission.timestamp) * 1000);
-        return submissionDate >= today;
+        return submissionDate >= today && submission.statusDisplay === "Accepted"; // Filter for accepted submissions
     });
 
-    for (let i = 0; i < submissions.length; i++) {
-        const submission = submissions[i];
-        if(submission.statusDisplay !== "Accepted"){
-            continue;
-        }
-        const submissionElement = document.createElement('div');
-        submissionElement.classList.add('submission');
-        submissionElement.innerHTML = `
-            <span class="submission-id">${new Date(parseInt(submission.timestamp) * 1000).toLocaleString()}</span>
-            <span class="submission-verdict">${submission.statusDisplay}</span><br>
-            <span class="submission-problem">${submission.title}</span>
-        `;
-        submissionsContainer.appendChild(submissionElement);
-    }
+    const submissionPromises = submissions.map(submission => {
+        return fetch(`https://stats-server-one.vercel.app/question/${submission.titleSlug}`)
+            .then(response => response.json())
+            .then(questionData => {
+                // If question data is available and contains question ID
+                if (questionData && questionData.questionId) {
+                    // Update submission object with question ID
+                    submission.questionId = questionData.questionId;
+                    return submission;
+                } else {
+                    return null;
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching question ID:', error);
+                return null;
+            });
+    });
+
+    // Resolve all submission promises
+    Promise.all(submissionPromises)
+        .then(validSubmissions => {
+            // Filter out null values (failed fetches)
+            validSubmissions = validSubmissions.filter(submission => submission !== null);
+            // Display recent submissions with question IDs
+            validSubmissions.forEach(submission => {
+                const submissionElement = document.createElement('div');
+                submissionElement.classList.add('submission');
+                submissionElement.innerHTML = `
+                    <span class="submission-id">${new Date(parseInt(submission.timestamp) * 1000).toLocaleString()}</span>
+                    <span class="submission-verdict">${submission.statusDisplay}</span><br>
+                    <span class="submission-problem">${submission.title}<b>(${submission.questionId})</b></span>
+                `;
+                submissionsContainer.appendChild(submissionElement);
+            });
+        })
+        .catch(error => console.error('Error fetching question IDs:', error));
 }
 
 
