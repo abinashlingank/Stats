@@ -216,7 +216,7 @@ function displayRecentSubmissions(submissions, containerId) {
                 submissionElement.innerHTML = `
                     <span class="submission-id">${new Date(parseInt(submission.timestamp) * 1000).toLocaleString()}</span>
                     <span class="submission-verdict">${submission.statusDisplay}</span><br>
-                    <span class="submission-problem">${submission.title}<b>(${submission.questionId})</b></span>
+                    <span class="submission-problem">${submission.title} <b style="color:red;">(${submission.questionId})</b></span>
                 `;
                 submissionsContainer.appendChild(submissionElement);
             });
