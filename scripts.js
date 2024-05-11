@@ -190,9 +190,9 @@ function displayRecentSubmissions(submissions, containerId) {
             .then(response => response.json())
             .then(questionData => {
                 // If question data is available and contains question ID
-                if (questionData && questionData.questionId) {
+                if (questionData && questionData.questionFrontendId) {
                     // Update submission object with question ID
-                    submission.questionId = questionData.questionId;
+                    submission.questionId = questionData.questionFrontendId;
                     return submission;
                 } else {
                     return null;
